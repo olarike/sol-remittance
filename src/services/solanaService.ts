@@ -3,7 +3,12 @@ import { Transaction, TransactionType } from '../entities/Transaction';
 import { User } from '../entities/User';
 import { NotificationService } from './notificationService';
 
-const connection = new Connection(process.env.SOLANA_RPC_URL, 'confirmed');
+const solanaRpcUrl = process.env.SOLANA_RPC_URL;
+if (!solanaRpcUrl) {
+  throw new Error('SOLANA_RPC_URL is not defined');
+}
+
+const connection = new Connection(solanaRpcUrl, 'confirmed');
 const notificationService = new NotificationService();
 
 export class SolanaService {
@@ -18,7 +23,7 @@ export class SolanaService {
   }
 
   async transferSOL(from: Keypair, to: PublicKey, amount: number, user: User): Promise<string> {
-    const transaction = await connection.requestAirdrop(from.publicKey, amount * LAMPORTS_PER_SOL);
+    const transactionSignature = await connection.requestAirdrop(from.publicKey, amount * LAMPORTS_PER_SOL);
 
     const newTransaction = Transaction.create({
       amount,
@@ -33,6 +38,6 @@ export class SolanaService {
     // Optionally send SMS if user has a phone number
     // await notificationService.sendSMS(user.phoneNumber, `Your transaction of ${amount} SOL has been completed.`);
 
-    return transaction;
+    return transactionSignature;
   }
 }

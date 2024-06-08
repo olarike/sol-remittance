@@ -22,7 +22,7 @@ export class AuthService {
       if (user.isTwoFactorEnabled) {
         throw new HttpException(403, '2FA required');
       }
-      return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
     }
     throw new HttpException(400, 'Invalid credentials');
   }
@@ -32,12 +32,25 @@ export class AuthService {
     user.twoFactorSecret = secret.base32;
     await user.save();
 
-    return qrcode.toDataURL(secret.otpauth_url);
+    const otpauthUrl = secret.otpauth_url;
+    if (!otpauthUrl) {
+      throw new HttpException(500, 'Error generating OTP auth URL');
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      qrcode.toDataURL(otpauthUrl, (err, data_url) => {
+        if (err) {
+          reject(new HttpException(500, 'Error generating QR code'));
+        } else {
+          resolve(data_url);
+        }
+      });
+    });
   }
 
   async verifyTwoFactorToken(user: User, token: string): Promise<boolean> {
     const verified = speakeasy.totp.verify({
-      secret: user.twoFactorSecret,
+      secret: user.twoFactorSecret!,
       encoding: 'base32',
       token,
     });
@@ -52,7 +65,7 @@ export class AuthService {
 
   verifyToken(token: string): any {
     try {
-      return jwt.verify(token, process.env.JWT_SECRET);
+      return jwt.verify(token, process.env.JWT_SECRET!);
     } catch (error) {
       throw new HttpException(401, 'Invalid token');
     }

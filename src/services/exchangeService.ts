@@ -7,6 +7,7 @@ import { NotificationService } from './notificationService';
 import { StateMachine } from '../utils/stateMachine';
 import { BalanceService } from './balanceService';
 import { ComplianceService } from './complianceService';
+import { LedgerType } from '../entities/Ledger'; // Import LedgerType
 
 const notificationService = new NotificationService();
 const balanceService = new BalanceService();

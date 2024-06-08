@@ -17,29 +17,35 @@ export enum TransactionType {
 @Entity()
 export class Transaction extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: number; // Use definite assignment assertion
+  id!: number;
 
   @Column()
-  amount!: number; // Use definite assignment assertion
+  amount!: number;
 
   @Column()
-  currency!: string; // Use definite assignment assertion
+  currency!: string;
 
   @Column({
     type: 'enum',
     enum: TransactionType
   })
-  type!: TransactionType; // Use definite assignment assertion
+  type!: TransactionType;
 
   @Column({
     type: 'enum',
     enum: TransactionState
   })
-  state!: TransactionState; // Use definite assignment assertion
+  state!: TransactionState;
 
   @Column({ nullable: true })
-  idempotencyKey!: string; // Use definite assignment assertion
+  idempotencyKey?: string;
 
   @ManyToOne(() => User, user => user.transactions)
-  user!: User; // Use definite assignment assertion
+  user!: User;
+
+  @Column({ type: 'float', nullable: true })
+  lockedExchangeRate?: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  rateLockExpiration?: Date;
 }

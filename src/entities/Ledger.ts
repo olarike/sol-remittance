@@ -9,23 +9,23 @@ export enum LedgerType {
 @Entity()
 export class Ledger extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: number; // Use definite assignment assertion
+  id!: number;
 
   @Column()
-  amount!: number; // Use definite assignment assertion
+  amount!: number;
 
   @Column({
     type: 'enum',
     enum: LedgerType,
   })
-  type!: LedgerType; // Use definite assignment assertion
+  type!: LedgerType;
 
   @Column()
-  currency!: string; // Use definite assignment assertion
+  currency!: string;
 
   @ManyToOne(() => User, user => user.ledgerEntries)
-  user!: User; // Use definite assignment assertion
+  user!: User;
 
   @CreateDateColumn()
-  createdAt!: Date; // Use definite assignment assertion
+  createdAt!: Date;
 }
